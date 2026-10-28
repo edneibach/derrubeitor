@@ -161,7 +161,7 @@ Mostra a situação cadastral (ativa, suspensa, baixada). É apenas uma pista: k
 
 ### 5) Montar o dossiê e o pacote de denúncias
 
-1. Reúna os fatos em um `dossier.txt` (**regra dura: nunca .md — só .txt**; as denúncias ficam exclusivamente nas pastas `send/NN-<destinatário>/`, uma por provedor — nunca num arquivo único combinado). A estrutura detalhada está em SKILL.md e SKILL.pt-BR.md.
+1. Reúna os fatos em um `dossier.txt` (**regra dura: nunca .md — só .txt**; as denúncias ficam exclusivamente nas pastas `send/email/NN-<destinatário>/` e `send/form/NN-<destinatário>/`, uma por provedor — nunca num arquivo único combinado). A estrutura detalhada está em SKILL.md e SKILL.pt-BR.md.
 2. Preencha um `case.json` seguindo o modelo `templates/case.example.json`.
 3. Rode:
 
@@ -169,11 +169,11 @@ Mostra a situação cadastral (ativa, suspensa, baixada). É apenas uma pista: k
    python scripts/makepackage.py case.json
    ```
 
-Isso cria a pasta `send/`, com uma subpasta por destinatário. Cada subpasta tem `EMAIL.txt` (o texto da denúncia), `gmail-link.txt` (link do Gmail já digitado) e `attachments/` (os anexos certos para aquele destinatário).
+Isso cria a pasta `send/` dividida por tipo de envio — `send/email/` (tudo que se envia por e-mail) e `send/form/` (tudo que se cola em formulário web) — com uma subpasta numerada por destinatário dentro de cada. Subpastas de e-mail têm `EMAIL.txt` (o texto da denúncia), `gmail-link.txt` (link do Gmail já digitado) e `attachments/` (os anexos certos); subpastas de formulário têm `FORM.txt` (o texto para colar).
 
 ## Como enviar as denúncias
 
-Para cada pasta dentro de `send/`:
+Para cada pasta de destinatário dentro de `send/email/` e `send/form/`:
 
 1. Abra `gmail-link.txt`, copie a URL e cole no navegador. O Gmail abre com destinatário, assunto e corpo já digitados.
 2. Se o corpo vier cortado, por limite de tamanho do link em alguns navegadores, abra `EMAIL.txt` e copie o texto abaixo da linha `===== CORPO =====`.
@@ -202,7 +202,7 @@ derrubeitor/
 ├── scripts/
 │   ├── fraudtriage.py       <- ferramenta principal (recon, fetch, analyze, cnpj)
 │   ├── gmaillink.py         <- gera o link do Gmail já digitado
-│   ├── makepackage.py       <- gera a pasta send/ com as denúncias
+│   ├── makepackage.py       <- gera a pasta send/ (email/ + form/) com as denúncias
 │   ├── autoreport_forms.py  <- OPCIONAL: envio assistido de formulários (camoufox)
 │   ├── extractforms.py      <- extrai formulários de um HTML salvo
 │   └── sample-kit.html      <- página sintética para testar o analyze

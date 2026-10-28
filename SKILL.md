@@ -57,11 +57,14 @@ case-<domain>-<yyyymmdd>/
 ├── dossier.txt            # the ONLY dossier file — tiered facts, IOCs, hashes
 ├── evidence/              # recon/fetch/analyze/cnpj console output saved as .txt,
 │                          #   raw stage*.html, *.json, iocs.csv, sha256-manifest.txt
-└── send/                  # one folder PER RECIPIENT, numbered in §3 filing order
-    ├── 1-<origin-host>/   # EMAIL.txt + gmail-link.txt + attachments/ (no Tier 3)
-    ├── 2-cloudflare/      # FORM.txt for web-form channels
-    ├── ...
-    └── 6-policia/         # ANEXO-POLICIAL.txt + attachments/ (full case incl. Tier 3)
+└── send/                  # TWO type folders; per-recipient folders inside, §3 order
+    ├── email/             # EMAIL-type sends
+    │   ├── 1-<origin-host>/  # EMAIL.txt + gmail-link.txt + attachments/ (no Tier 3)
+    │   └── 4-certbr/      # ...
+    └── form/              # WEB-FORM-type sends (paste/submit channels)
+        ├── 2-cloudflare/  # FORM.txt for web-form channels
+        ├── 5-blocklists/  # INSTRUCOES.txt + urls-kit.txt (+ receipts/)
+        └── 6-policia/     # ANEXO-POLICIAL.txt + attachments/ (full case incl. Tier 3)
 ```
 
 Save everything with UTC timestamps (headers, HTML bodies, sha256 — the tool
@@ -74,12 +77,15 @@ prints them). Chain of custody starts here.
   in their per-recipient folders. Raw evidence keeps its native extension
   (`.html`, `.json`, `.csv`) — the rule targets every document the agent
   writes.
-- **One folder per provider to email**, under `send/`, numbered in the §3
-  order (`1-netlify/`, `2-cloudflare/`, `4-certbr/`, `6-policia/`, …), each
-  holding `EMAIL.txt` (+ `gmail-link.txt`) or `FORM.txt` for web forms, plus
-  a curated `attachments/` (Tier-3-free for every non-police recipient).
-  `makepackage.py case.json` builds this tree automatically; when writing by
-  hand, reproduce it exactly.
+- **Two type folders under `send/` — `send/email/` and `send/form/`** — one
+  folder per recipient inside each, numbered in the §3 filing order
+  (`email/1-netlify/`, `form/2-cloudflare/`, `email/4-certbr/`,
+  `form/6-policia/`, …). Email channels hold `EMAIL.txt` (+ `gmail-link.txt`);
+  web-form channels hold `FORM.txt` (blocklists: `INSTRUCOES.txt` +
+  `urls-kit.txt`; police B.O. annex: `ANEXO-POLICIAL.txt` — Tier 3 lives ONLY
+  there), plus a curated `attachments/` (Tier-3-free for every non-police
+  recipient). `makepackage.py case.json` builds this tree automatically; when
+  writing by hand, reproduce it exactly.
 
 **Step 1 — recon.**
 ```
@@ -128,7 +134,8 @@ name tricks (`SERVIC0S`, `REGULARIZAND0`), fresh registration (<180 days).
 
 **Step 6 — assemble the dossier** (`dossier.txt` — NEVER `.md`): tiered facts,
 IOC table, timeline, screenshots/HTML hashes. The §4 reports go ONLY into the
-per-recipient folders of Step 0 (`send/NN-<provider>/EMAIL.txt` or `FORM.txt`)
+per-recipient folders of Step 0 (`send/email/NN-<provider>/EMAIL.txt` or
+`send/form/NN-<provider>/FORM.txt`)
 — never one combined reports file. Build them with
 `python scripts/makepackage.py case.json` (schema: `templates/case.example.json`).
 
@@ -152,7 +159,7 @@ gets police attention.
 | `validate-cpf/-cnpj` | Offline checksum — no network |
 | `extractforms.py <saved.html>` | Form action/method + named fields of a saved page (recon of reporting forms) |
 | `gmaillink.py --to … --body-file …` | Pre-typed Gmail compose link (see §4 T-GMAIL) |
-| `makepackage.py case.json` | Generates the zero-script send/ package for a case (EMAIL.txt + gmail-link.txt + attachments per destination; schema: templates/case.example.json) |
+| `makepackage.py case.json` | Generates the zero-script send/ package for a case (send/email/ + send/form/, EMAIL.txt + gmail-link.txt + attachments per destination; schema: templates/case.example.json) |
 | `autoreport_forms.py <cmd>` | OPTIONAL browser-assisted web-form submission (camoufox; consent-first — see §4 T-FORMS before running) |
 | `selftest` | Offline sanity checks of validators + regexes |
 

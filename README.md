@@ -96,7 +96,7 @@ derrubeitor/
 ├── scripts/
 │   ├── fraudtriage.py       <- main tool (recon, fetch, analyze, cnpj)
 │   ├── gmaillink.py         <- builds the pre-typed Gmail link
-│   ├── makepackage.py       <- builds the send/ report package
+│   ├── makepackage.py       <- builds the send/ package (send/email/ + send/form/)
 │   ├── autoreport_forms.py  <- OPTIONAL assisted form submission (camoufox)
 │   ├── extractforms.py      <- extracts forms from saved HTML
 │   └── sample-kit.html      <- synthetic page to test analyze

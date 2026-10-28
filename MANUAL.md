@@ -67,7 +67,7 @@ Shows the registry status (active, suspended, closed). It is only a lead: scam k
 
 ### 5) Build the dossier and the report package
 
-1. Gather the facts into a `dossier.txt` (**hard rule: never .md — .txt only**; reports live exclusively in `send/NN-<recipient>/` folders, one per provider — never in one combined file). The detailed structure is in SKILL.md and SKILL.pt-BR.md.
+1. Gather the facts into a `dossier.txt` (**hard rule: never .md — .txt only**; reports live exclusively in `send/email/NN-<recipient>/` and `send/form/NN-<recipient>/` folders, one per provider — never in one combined file). The detailed structure is in SKILL.md and SKILL.pt-BR.md.
 2. Fill a `case.json` following the model in `templates/case.example.json`.
 3. Run:
 
@@ -75,11 +75,11 @@ Shows the registry status (active, suspended, closed). It is only a lead: scam k
    python scripts/makepackage.py case.json
    ```
 
-This creates the `send/` folder, with one subfolder per recipient. Each subfolder has `EMAIL.txt` (the report text), `gmail-link.txt` (the pre-typed Gmail link) and `attachments/` (the right evidence for that recipient).
+This creates the `send/` folder split by send type — `send/email/` (everything you send by email) and `send/form/` (everything you paste into a web form) — with one numbered subfolder per recipient inside each. Email subfolders have `EMAIL.txt` (the report text), `gmail-link.txt` (the pre-typed Gmail link) and `attachments/` (the right evidence for that recipient); form subfolders have `FORM.txt` (the text to paste).
 
 ## How to send the reports
 
-For each folder inside `send/`:
+For each recipient folder inside `send/email/` and `send/form/`:
 
 1. Open `gmail-link.txt`, copy the URL and paste it in your browser. Gmail opens with recipient, subject and body already typed.
 2. If the body arrives cut off, due to link size limits in some browsers, open `EMAIL.txt` and copy everything below the `===== CORPO =====` line.

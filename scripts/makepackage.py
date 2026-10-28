@@ -9,17 +9,21 @@ Nothing it writes executes on the reporter's machine, by design (trust:
 users should never have to run scripts to send an abuse report).
 
 Reads case.json (schema + filled example: templates/case.example.json) and
-writes, by default, into send/ next to the case.json:
+writes, by default, into send/ next to the case.json. The package is split
+by SEND TYPE into two folders — send/email/ (everything you send by email)
+and send/form/ (everything you paste/submit into a web form) — with one
+numbered per-recipient folder inside each (numbering = global §3 filing
+order):
 
   send/LEIA-ME.txt                      master flow + table
-  send/<n>-<dest>/EMAIL.txt             Para/Assunto + '===== CORPO =====' + body
-  send/<n>-<dest>/gmail-link.txt       one URL -> Gmail opens pre-typed
-  send/<n>-<dest>/attachments/...      evidence (glob-copied; curate so that
-                                       provider folders stay Tier-3-free)
-  send/<n>-<form>/FORM.txt              text to paste into a web form
-  send/5-blocklists/urls-kit.txt       one URL per line
-  send/5-blocklists/INSTRUCOES.txt      default or instructions_file
-  send/<police>/<annex> + attachments/  full case incl. Tier-3 (police only)
+  send/email/<n>-<dest>/EMAIL.txt        Para/Assunto + '===== CORPO =====' + body
+  send/email/<n>-<dest>/gmail-link.txt   one URL -> Gmail opens pre-typed
+  send/email/<n>-<dest>/attachments/... evidence (glob-copied; curate so that
+                                        provider folders stay Tier-3-free)
+  send/form/<n>-<dest>/FORM.txt          text to paste into a web form
+  send/form/5-blocklists/urls-kit.txt    one URL per line
+  send/form/5-blocklists/INSTRUCOES.txt  default or instructions_file
+  send/form/<police>/<annex> + attach.   full case incl. Tier-3 (police only)
 
 usage:
   python makepackage.py case.json [--out send]
@@ -120,7 +124,7 @@ def main():
         subject = entry["subject"]
         order = entry.get("order", "")
         body = read_text(base, entry, "body_file", "body")
-        d = os.path.join(out, name)
+        d = os.path.join(out, "email", name)
         os.makedirs(d, exist_ok=True)
         n_att = len(copy_attachments(base, os.path.join(d, "attachments"),
                                      entry.get("attachments")))
@@ -140,13 +144,13 @@ def main():
                 " truncam o link do Gmail; EMAIL.txt e a copia segura do corpo\n"
                 .format(name, len(uq(body)), WARN_LIMIT))
         wfile(os.path.join(d, "gmail-link.txt"), link + "\n")
-        rows.append("| {o} | `{n}` | {to} | gmail-link.txt (ou copiar de EMAIL.txt) | {k} anexos |"
+        rows.append("| {o} | `email/{n}` | {to} | gmail-link.txt (ou copiar de EMAIL.txt) | {k} anexos |"
                     .format(o=order, n=name, to=to, k=n_att))
 
     for entry in case.get("forms", []):
         name = entry["name"]
         order = entry.get("order", "")
-        d = os.path.join(out, name)
+        d = os.path.join(out, "form", name)
         os.makedirs(d, exist_ok=True)
         text = read_text(base, entry, "text_file", "text")
         form_md = (
@@ -156,11 +160,11 @@ def main():
             "{t}\n"
         ).format(o=order, n=name, u=entry.get("form_url", ""), t=text)
         wfile(os.path.join(d, "FORM.txt"), form_md)
-        rows.append("| {o} | `{n}` | formulario web | colar texto do FORM.txt | - |"
+        rows.append("| {o} | `form/{n}` | formulario web | colar texto do FORM.txt | - |"
                     .format(o=order, n=name))
 
     if case.get("blocklist_urls"):
-        d = os.path.join(out, "5-blocklists")
+        d = os.path.join(out, "form", "5-blocklists")
         os.makedirs(d, exist_ok=True)
         wfile(os.path.join(d, "urls-kit.txt"), "\n".join(case["blocklist_urls"]) + "\n")
         instr = case.get("instructions_file")
@@ -168,11 +172,11 @@ def main():
             shutil.copy2(os.path.join(base, instr), os.path.join(d, "INSTRUCOES.txt"))
         else:
             wfile(os.path.join(d, "INSTRUCOES.txt"), DEFAULT_INSTRUCOES)
-        rows.append("| 5 | `5-blocklists` | Safe Browsing / SmartScreen / PhishTank / WhatsApp / oficiais | INSTRUCOES.txt + urls-kit.txt | - |")
+        rows.append("| 5 | `form/5-blocklists` | Safe Browsing / SmartScreen / PhishTank / WhatsApp / oficiais | INSTRUCOES.txt + urls-kit.txt | - |")
 
     police = case.get("police")
     if police:
-        d = os.path.join(out, police.get("name", "6-policia"))
+        d = os.path.join(out, "form", police.get("name", "6-policia"))
         os.makedirs(d, exist_ok=True)
         annex = police.get("annex_file")
         if annex:
@@ -182,19 +186,22 @@ def main():
             shutil.copy2(os.path.join(base, annex), os.path.join(d, dst_name))
         n_att = len(copy_attachments(base, os.path.join(d, "attachments"),
                                       police.get("attachments")))
-        rows.append("| 6 | `{n}` | B.O. / autoridade policial | anexo + attachments (TUDO, incl. camada 3) | {k} anexos |"
+        rows.append("| 6 | `form/{n}` | B.O. / autoridade policial | anexo + attachments (TUDO, incl. camada 3) | {k} anexos |"
                     .format(n=police.get("name", "6-policia"), k=n_att))
 
     leia_me = (
         "# LEIA-ME - PACOTE DE ENVIO (zero scripts: so texto e links)\n\n"
         "Este pacote contem apenas arquivos de texto - nada executa na sua maquina.\n\n"
-        "Fluxo por e-mail:\n"
+        "Layout: `email/` = envios POR E-MAIL; `form/` = envios POR FORMULARIO WEB"
+        " (colar/submeter). Numeracao = ordem global de envio do §3.\n\n"
+        "Fluxo por e-mail (pastas em email/):\n"
         "1. Abra `gmail-link.txt` e cole a URL no navegador - o Gmail abre com"
         " destinatario+assunto+corpo pre-digitados.\n"
         "2. Se o corpo vier cortado, abra `EMAIL.txt` e copie o texto abaixo da linha"
         " `===== CORPO =====`.\n"
         "3. Anexe os arquivos de `attachments/` e envie (releia antes de enviar).\n\n"
-        "Formularios web: cole o texto de `FORM.txt`. Blocklists: `urls-kit.txt`.\n"
+        "Formularios web (pastas em form/): cole o texto de `FORM.txt`."
+        " Blocklists: `urls-kit.txt`.\n"
         "Camada 3 (PISTAS) fica APENAS na pasta da policia - nunca em pastas de provedores.\n\n"
         "| Ordem | Pasta | Destino | Como | Anexos |\n"
         "|---|---|---|---|---|\n"

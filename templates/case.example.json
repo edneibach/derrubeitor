@@ -1,6 +1,6 @@
 {
   "case_name": "case-example.com-20260101",
-  "_schema": "makepackage.py input. All paths are relative to this file. 'body_file'/'text_file' hold the pure body text (no headers). 'attachments' supports globs; keep provider folders Tier-3-free (no victim PII, no CNPJ/CPF leads) — full evidence goes only in 'police'.",
+  "_schema": "makepackage.py input. All paths are relative to this file. 'body_file'/'text_file' hold the pure body text (no headers). 'attachments' supports globs; keep provider folders Tier-3-free (no victim PII, no CNPJ/CPF leads) — full evidence goes only in 'police'. Output is grouped by send type: emails -> send/email/<n>-<dest>/, forms (incl. blocklists and police annex) -> send/form/<n>-<dest>/; numbering = global §3 filing order.",
 
   "emails": [
     {

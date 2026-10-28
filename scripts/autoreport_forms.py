@@ -130,7 +130,7 @@ class XhrWatch:
 
     def _on_response(self, response):
         try:
-            if self.KEY and self.KEY in response.url and \
+            if (not self.KEY or self.KEY in response.url) and \
                     response.request.method == "POST":
                 self.hits.append(f"{response.request.method} {response.url} "
                                  f"-> {response.status}")
@@ -370,8 +370,9 @@ def cf_submit(urls, name, email, evidence_text, brand, country, dry_run,
                 print("[cf] ASSIST MODE: form pre-filled in the open window — "
                       "verify, solve Turnstile if shown, click Submit "
                       "yourself. Waiting up to 10 min...")
-                _cf_turnstile_and_submit(page, human=True)
-                receipt("cf", [f"verdict: human-confirmed-or-timeout",
+                ok = _cf_turnstile_and_submit(page, human=True)
+                receipt("cf", [f"verdict: "
+                                f"{'human-confirmed' if ok else 'TIMEOUT-not-confirmed'}",
                                 f"hostname: {host}",
                                 f"urls: {host_urls}",
                                 "xhr: " + ("; ".join(watch.evidence()) or "-")],
@@ -406,13 +407,49 @@ def _cf_fill(page, urls, name, email, evidence_text, brand, country):
         page.get_by_role("option", name=country, exact=False).first.click()
     except Exception as e:  # noqa: BLE001
         print(f"[cf] country select skipped: {e}")
-    page.get_by_text("Please forward my report to the website hosting provider",
-                     exact=False).first.click()
-    page.get_by_text("Include my name and contact information with the report to the website hosting provider",
-                     exact=False).first.click()
-    page.get_by_text("DSA certification of bona fide belief",
-                     exact=False).last.click()
+    _cf_check(page, "Please forward my report to the website hosting provider")
+    _cf_check(page, "Include my name and contact information with the report "
+                    "to the website hosting provider")
+    _cf_check(page, "DSA certification of bona fide belief")
     print("[cf] form filled")
+
+
+def _cf_check(page, text):
+    """Check a Cloudflare abuse-form checkbox by its label text.
+
+    Skips when already checked or locked (disabled): the 2026-10 form ships
+    'forward my report to provider/owner' pre-checked AND disabled (locked
+    ON), so clicking them is impossible and unnecessary. Returns silently so
+    a locked checkbox never aborts the fill."""
+    info = page.evaluate(
+        """(t) => {
+            for (const inp of document.querySelectorAll('input[type=checkbox]')) {
+                const lab = inp.labels && inp.labels[0];
+                if (lab && lab.textContent.replace(/\\s+/g, ' ').includes(t)) {
+                    return {id: inp.id, checked: inp.checked,
+                            disabled: inp.disabled};
+                }
+            }
+            return null;
+        }""", text)
+    short = text[:60]
+    if info is None:
+        print(f"[cf] checkbox not found (skip): {short}")
+        return
+    if info["checked"]:
+        print(f"[cf] checkbox already checked (skip): {short}")
+        return
+    if info["disabled"]:
+        print(f"[cf] checkbox locked off, cannot check (skip): {short}")
+        return
+    page.locator(f"label[for='{info['id']}']").click()
+    page.wait_for_timeout(400)
+    after = page.evaluate(
+        """(id) => {
+            const inp = document.getElementById(id);
+            return inp ? inp.checked : null;
+        }""", info["id"])
+    print(f"[cf] checked: {short} -> {after}")
 
 
 def _cf_turnstile_and_submit(page, human=False):
@@ -423,7 +460,29 @@ def _cf_turnstile_and_submit(page, human=False):
         except Exception as e:  # noqa: BLE001
             print(f"[cf] submit click err: {e}")
             return False
-    # if a turnstile checkbox appears, click it once (what a user would do)
+    if human:
+        # assist mode: the HUMAN clicks Turnstile + Submit. Automation only
+        # waits and watches for the confirmation copy (up to 10 minutes);
+        # it never touches the page — automation prepares, the human sends.
+        done_markers = ("thank you", "has been submitted", "report received",
+                        "we have received", "report submitted")
+        for i in range(300):
+            page.wait_for_timeout(2000)
+            try:
+                body = (page.inner_text("body") or "").lower()
+                if any(m in body for m in done_markers):
+                    print(f"[cf] confirmation detected after "
+                          f"~{(i + 1) * 2}s of waiting")
+                    return True
+            except Exception:  # noqa: BLE001
+                pass
+            if (i + 1) % 75 == 0:
+                print(f"[cf] still waiting for your Submit... "
+                      f"({(i + 1) * 2}s elapsed)")
+        print("[cf] no confirmation within 10 min — treat as NOT submitted")
+        return False
+    # unattended: if a turnstile checkbox appears, click it once (what a user
+    # would do)
     for _ in range(15):
         page.wait_for_timeout(1000)
         for f in page.frames:

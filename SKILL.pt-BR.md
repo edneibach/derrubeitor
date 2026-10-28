@@ -46,11 +46,14 @@ case-<dominio>-<aaaammdd>/
 ├── dossier.txt            # o ÚNICO arquivo de dossiê — fatos por camada, IOCs, hashes
 ├── evidence/              # saída de recon/fetch/analyze/cnpj salva como .txt,
 │                          #   stage*.html brutos, *.json, iocs.csv, sha256-manifest.txt
-└── send/                  # uma pasta POR DESTINATÁRIO, numerada na ordem do §3
-    ├── 1-<hospedagem>/    # EMAIL.txt + gmail-link.txt + attachments/ (sem camada 3)
-    ├── 2-cloudflare/      # FORM.txt para canais de formulário web
-    ├── ...
-    └── 6-policia/         # ANEXO-POLICIAL.txt + attachments/ (caso completo, com camada 3)
+└── send/                  # DUAS pastas por tipo; destinatários dentro, na ordem do §3
+    ├── email/             # envios POR E-MAIL
+    │   ├── 1-<hospedagem>/   # EMAIL.txt + gmail-link.txt + attachments/ (sem camada 3)
+    │   └── 4-certbr/      # ...
+    └── form/              # envios POR FORMULÁRIO WEB (colar/submeter)
+        ├── 2-cloudflare/  # FORM.txt para canais de formulário web
+        ├── 5-blocklists/  # INSTRUCOES.txt + urls-kit.txt (+ receipts/)
+        └── 6-policia/     # ANEXO-POLICIAL.txt + attachments/ (caso completo, com camada 3)
 ```
 
 Salve tudo com horário UTC (headers, corpos HTML, sha256 — a ferramenta
@@ -63,13 +66,15 @@ imprime). A cadeia de custódia começa aqui.
   SOMENTE nas pastas por destinatário. Evidência bruta mantém a extensão
   nativa (`.html`, `.json`, `.csv`) — a regra vale para todo documento que
   o agente escreve.
-- **Uma pasta por provedor a contatar por e-mail**, dentro de `send/`,
-  numerada na ordem do §3 (`1-netlify/`, `2-cloudflare/`, `4-certbr/`,
-  `6-policia/`, …), cada uma com `EMAIL.txt` (+ `gmail-link.txt`) ou
-  `FORM.txt` para formulários web, e `attachments/` curado (sem camada 3
-  para todo destinatário que não seja a polícia).
-  O `makepackage.py case.json` monta essa árvore automaticamente; se for
-  escrever à mão, reproduza-a exatamente.
+- **Duas pastas por tipo dentro de `send/` — `send/email/` e `send/form/`** —
+  uma pasta por destinatário dentro de cada, numerada na ordem do §3
+  (`email/1-netlify/`, `form/2-cloudflare/`, `email/4-certbr/`,
+  `form/6-policia/`, …). Canais de e-mail têm `EMAIL.txt` (+ `gmail-link.txt`);
+  canais de formulário web têm `FORM.txt` (blocklists: `INSTRUCOES.txt` +
+  `urls-kit.txt`; anexo do B.O.: `ANEXO-POLICIAL.txt` — a camada 3 vive SÓ
+  ali), e `attachments/` curado (sem camada 3 para todo destinatário que não
+  seja a polícia). O `makepackage.py case.json` monta essa árvore
+  automaticamente; se for escrever à mão, reproduza-a exatamente.
 
 **Passo 1 — reconhecimento.**
 ```
@@ -122,7 +127,7 @@ de dígito-no-nome (`SERVIC0S`, `REGULARIZAND0`), abertura recente (<180 dias).
 **Passo 6 — monte o dossiê** (`dossier.txt` — NUNCA `.md`): fatos por camada,
 tabela de IOCs, linha do tempo, hashes das capturas/HTML. As denúncias do §4
 vão SOMENTE para as pastas por destinatário do Passo 0
-(`send/NN-<provedor>/EMAIL.txt` ou `FORM.txt`) — nunca um arquivo único
+(`send/email/NN-<provedor>/EMAIL.txt` ou `send/form/NN-<provedor>/FORM.txt`) — nunca um arquivo único
 combinado. Monte com
 `python scripts/makepackage.py case.json` (schema: `templates/case.example.json`).
 
@@ -147,7 +152,7 @@ pelos marcadores do kit (token de beacon, fonte HTTrack, roteiro de valores)
 | `validate-cpf/-cnpj` | Soma verificável offline — sem rede |
 | `extractforms.py <html-salvo>` | Action/método do form + campos nomeados de uma página salva (recon de formulários de denúncia) |
 | `gmaillink.py --to … --body-file …` | Link do Gmail pré-digitado (ver §4 T-GMAIL) |
-| `makepackage.py case.json` | Gera o pacote send/ sem scripts para o caso (EMAIL.txt + gmail-link.txt + attachments por destino; schema: templates/case.example.json) |
+| `makepackage.py case.json` | Gera o pacote send/ sem scripts para o caso (send/email/ + send/form/, EMAIL.txt + gmail-link.txt + attachments por destino; schema: templates/case.example.json) |
 | `autoreport_forms.py <cmd>` | Envio OPCIONAL assistido por navegador para formulários web (camoufox; consentimento primeiro — veja o T-FORMS do §4 antes de rodar) |
 | `selftest` | Checagem offline de validadores + regexes |
 
