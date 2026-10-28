@@ -93,7 +93,7 @@ sempre manuais (Gmail pré-digitado). Para um provedor novo:
 `autoreport_forms.py map <url>` despeja o formulário e o próprio agente de
 IA escreve o adaptador seguindo os exemplos no script.
 
-## Caminho rápido: denuncar sem a ferramenta (10 minutos)
+## Caminho rápido: denunciar sem a ferramenta (10 minutos)
 
 Se você só quer denunciar agora, sem instalar nada:
 
