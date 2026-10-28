@@ -1,4 +1,4 @@
-# DERRUBEITOR — Derrubada de Fraudes Brasileiras (OSINT → Denúncias)
+# DERRUBEITOR — Derrubada de golpes e phishing (OSINT → Denúncias)
 
 > Versão em português do `SKILL.md`. As duas versões dizem a mesma coisa — mantenha-as em sincronia. Os templates de denúncia em **português** (§4) são para os destinatários brasileiros: CERT.br, Receita Federal, ANPD, polícia. Para provedores internacionais (Netlify, Vercel, GitHub, Cloudflare, registrador), use os templates em inglês do `SKILL.md` §4.
 
@@ -176,13 +176,13 @@ pelos marcadores do kit (token de beacon, fonte HTTrack, roteiro de valores)
 
 ### T-ORIGEM — para a hospedagem de origem (a mais eficaz)
 ```
-Assunto: Phishing da Receita Federal — <DOMINIO> — <REQUEST-ID-HEADER> <ID>
+Assunto: Phishing que imita <ENTIDADE (ex.: Receita Federal / um banco / uma
+entregadora)> — <DOMINIO> — <REQUEST-ID-HEADER> <ID>
 
 Às <UTC> fiz uma requisição HTTP GET a <URL>. A resposta trouxe o header de
 vocês <REQUEST-ID-HEADER>: <VALUE>, ou seja, o site é servido pela sua
-plataforma. Trata-se de um kit de phishing que se passa pela Receita
-Federal do Brasil (gov.br) para extorquir pagamentos via PIX de
-contribuintes brasileiros.
+plataforma. Trata-se de um kit de phishing que se passa por <ENTIDADE>
+para extorquir pagamentos via <MEIO (ex.: PIX)>.
 
 URLs do fluxo: <TODAS AS URLS>
 Evidências anexadas: headers completos da resposta, HTML salvo
@@ -197,8 +197,8 @@ autoridades policiais (Boletim de Ocorrência nº <Nº OU "em tramitação">).
 ```
 URLs denunciadas: <URLS DO FLUXO>
 Tipo: Phishing. Os sites nessas URLs (servidos via Cloudflare, cf-ray
-<VALOR> em <UTC>) se passam pela Receita Federal / gov.br para extorquir
-pagamentos PIX de contribuintes brasileiros. Anexos: headers, HTML,
+<VALOR> em <UTC>) se passam por <ENTIDADE> para extorquir pagamentos via
+<MEIO (ex.: PIX)>. Anexos: headers, HTML,
 capturas. Por favor reencaminhem à hospedagem de origem e incluam os
 domínios na blocklist de phishing.
 ```
@@ -206,8 +206,8 @@ domínios na blocklist de phishing.
 ### T-REGISTRADOR (em português se o registrador for brasileiro; senão use o template em inglês)
 ```
 O domínio <DOMINIO> (registrado em <DATA>, handle RDAP <HANDLE>) está sendo
-usado exclusivamente para phishing que imita a Receita Federal (gov.br)
-com extorsão via PIX de contribuintes brasileiros. URLs: <LISTA>.
+usado exclusivamente para phishing que imita <ENTIDADE> com extorsão via
+<MEIO (ex.: PIX)>. URLs: <LISTA>.
 Evidências anexadas. Solicito a aplicação da política de uso aceitável e a
 avaliação de suspensão do domínio.
 ```
@@ -215,7 +215,7 @@ avaliação de suspensão do domínio.
 ### T-CERTBR — e-mail para cert@cert.br
 Dossiê completo: URLs, horários UTC, headers, descrição do kit, lista de
 IOCs, links de capturas de tela. Afirme com clareza: phishing ativo contra
-contribuintes brasileiros, impersonando a Receita Federal; infraestrutura:
+usuários do <PAÍS>, impersonando <ENTIDADE>; infraestrutura:
 registrador <NOME>, CDN <CLOUDFLARE?>, hospedagem de origem <PROVEDOR SE
 FINGERPRINTADA>. Mencione o TLD .br se for o caso.
 

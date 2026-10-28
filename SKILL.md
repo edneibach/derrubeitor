@@ -1,9 +1,9 @@
 ---
 name: derrubeitor
-description: DERRUBEITOR — investigate and take down Brazilian fraud (golpe, phishing, CPF/PIX scams, fake Receita Federal / gov.br / Desenrola Brasil sites) by building evidence and filing abuse reports with the parties who can act — CDN, origin host, registrar, Safe Browsing, CERT.br, ANPD, Receita Federal, police. Bundles a keyless, stdlib-only Python triage toolkit (DNS, RDAP, CT logs, urlscan, CNPJ registry lookup, kit IOC extraction). Use when the user reports a Brazilian scam site, suspicious link, or WhatsApp golpe message and wants analysis, evidence, or a takedown. Use ONLY for fraud targeting Brazil/Portuguese speakers; it is not a general phishing skill.
+description: DERRUBEITOR - investigate and take down scam and phishing sites of any kind (golpe, phishing, bank/government/brand impersonation, PIX or card payment extortion, any country) by building evidence and filing abuse reports with the parties who can act: CDN, origin host, registrar, Safe Browsing, national CSIRT (CERT.br in Brazil), police. Extra smarts for Brazilian fraud: CPF/CNPJ checks, CERT.br/ANPD/Receita Federal channels, known BR kit families. Bundles a keyless, stdlib-only Python triage toolkit (DNS, RDAP, CT logs, urlscan, CNPJ registry lookup, kit IOC extraction). Use when the user reports a scam site, suspicious link, or lure message and wants analysis, evidence, or a takedown.
 ---
 
-# DERRUBEITOR — Brazil Fraud Takedown (OSINT → Abuse Reports)
+# DERRUBEITOR - Scam/Phishing Takedown (OSINT → Abuse Reports)
 
 **Languages:** this file is the English reference (auto-loaded by opencode).
 `SKILL.pt-BR.md` is the full Portuguese version, and `README.md` is the
@@ -173,12 +173,13 @@ gets police attention.
 
 ### T-ORIGIN — to the host provider (the workhorse)
 ```
-Subject: Phishing impersonating Receita Federal — <DOMAIN> — <REQUEST-ID-HEADER> <ID>
+Subject: Phishing impersonating <ENTITY (e.g. Receita Federal / a bank / a
+delivery brand)> — <DOMAIN> — <REQUEST-ID-HEADER> <ID>
 
 At <UTC-TIMESTAMP> I retrieved <URL> via HTTP GET. The response carried
 your header <REQUEST-ID-HEADER>: <VALUE>, so the site is served by your
-platform. It is a phishing kit impersonating the Brazilian Federal Revenue
-Service (Receita Federal / gov.br) to extort payments via PIX.
+platform. It is a phishing kit impersonating <ENTITY> to extort payments
+via <PAYMENT METHOD (e.g. PIX)>.
 
 URLs: <ALL STAGE URLS>
 Evidence: full response headers, saved HTML (sha256 <HASH>), screenshots.
@@ -192,23 +193,23 @@ account records for law enforcement (Brazilian police report pending:
 ```
 Reporting URL(s): <STAGE URLS>
 Type: Phishing. The sites at these URLs (served via Cloudflare, cf-ray
-<VALUE> at <UTC>) impersonate Receita Federal / gov.br to extort PIX
-payments from Brazilian taxpayers. Attached: headers, HTML, screenshots.
+<VALUE> at <UTC>) impersonate <ENTITY> to extort payments via
+<PAYMENT, e.g. PIX>. Attached: headers, HTML, screenshots.
 Please relay to the origin host and add to the phishing blocklist.
 ```
 
 ### T-REGISTRAR
 ```
 Domain <DOMAIN> (registered <DATE>, RDAP handle <HANDLE>) is being used
-exclusively for phishing impersonating the Brazilian Receita Federal
-(gov.br) with PIX extortion. URLs: <LIST>. Evidence attached. Please
+exclusively for phishing impersonating <ENTITY> with payment extortion
+(e.g. PIX). URLs: <LIST>. Evidence attached. Please
 enforce your AUP and consider suspension.
 ```
 
 ### T-CERTBR — email to cert@cert.br
 Full dossier: URLs, UTC timestamps, headers, kit description, IOC list,
-screenshot links. State plainly: active phishing against Brazilian
-taxpayers, impersonating Receita Federal; infra: registrar <NAME>, CDN
+screenshot links. State plainly: active phishing against <COUNTRY> users,
+impersonating <ENTITY>; infra: registrar <NAME>, CDN
 <CLOUDFLARE?>, origin <PROVIDER IF FINGERPRINTED>. Mention .br TLD if
 applicable.
 
