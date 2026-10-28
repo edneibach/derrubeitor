@@ -1,10 +1,11 @@
 # DERRUBEITOR (português)
 
 > Versão em português do README. English version: [README.md](README.md).
+> Uso manual sem agente de IA: [MANUAL.md](MANUAL.md) (em inglês).
 
 Ferramenta gratuita para derrubar sites de golpe e phishing. Funciona com qualquer tipo de golpe: link falso recebido no WhatsApp, site que imita um banco, um boleto, uma entrega, uma empresa, um programa de governo, uma promoção, um investimento em criptomoeda. Se a página existe para enganar alguém e tirar dinheiro dela, serve.
 
-Você fornece o link do golpe. A ferramenta reúne as provas e monta as denúncias prontas para você revisar e enviar.
+Você fornece o link do golpe. O agente de IA conduz o caso inteiro — investigação, evidência, dossiê e denúncias prontas para revisar e enviar — sempre pedindo sua confirmação antes de qualquer envio. Também dá para conduzir tudo manualmente (seção "Preparação" abaixo e o MANUAL.md).
 
 Há suporte extra para golpes brasileiros: consulta de CNPJ, validação de CPF, contatos da CERT.br e da polícia, e reconhecimento de famílias de kit já conhecidas, como as que imitam a Receita Federal e o Desenrola Brasil. Esses recursos são opcionais. O caminho principal funciona para golpe de qualquer país.
 
@@ -12,10 +13,10 @@ Sem cadastro, sem chave de API, sem custo. O pacote de denúncias gerado no fina
 
 ## Para quem é
 
+- **Uso principal: como skill no seu agente de IA** — opencode, Claude Code ou qualquer outro (veja a seção abaixo).
 - Você recebeu um golpe por WhatsApp, SMS ou e-mail e quer o site derrubado.
-- Sem conhecimento técnico: comece pela seção "Caminho rápido", que permite denunciar em dez minutos sem instalar nada.
+- Sem conhecimento técnico: peça ao seu agente de IA, ou comece pela seção "Caminho rápido", que permite denunciar em dez minutos sem instalar nada.
 - Quem sabe usar um terminal pode ir até o final do caminho completo, que gera o dossiê de evidências e as denúncias com o Gmail já digitado.
-- Os arquivos SKILL.md também permitem usar o projeto como skill no agente opencode.
 
 ## Como funciona
 
@@ -37,23 +38,13 @@ Com isso em mente, a ferramenta:
 - Não instala nada além de baixar esta pasta.
 - O pacote de denúncias final contém apenas arquivos de texto e links.
 
-## Preparação (5 minutos)
-
-1. Instale o Python 3.8 ou mais novo em https://www.python.org/downloads/ (no Windows, marque "Add Python to PATH" durante a instalação).
-2. Baixe ou clone esta pasta.
-3. Abra o terminal dentro da pasta e rode:
-
-   ```
-   python scripts/fraudtriage.py selftest
-   ```
-
-   Deve terminar com `selftest OK`. No Windows o comando pode ser `py` em vez de `python`.
-
 ## Como usar como skill de agente de IA (opencode, Claude, outros)
 
-O projeto é uma skill: as instruções (`SKILL.md`) ensinam o agente a conduzir
-o caso inteiro — recon, evidência, dossiê e denúncias — pedindo sua
-confirmação antes de qualquer envio.
+**Este é o uso principal do projeto.** É uma skill: as instruções do `SKILL.md`
+ensinam qualquer agente capaz a conduzir o fluxo inteiro — recon, evidência,
+dossiê, pacote de denúncias e o envio assistido opcional — pedindo sua
+confirmação antes de qualquer envio. É agnóstica de modelo: qualquer agente
+que leia um arquivo e rode comandos shell com Python 3.8+ consegue.
 
 - **opencode (nível projeto — já fica automático neste repositório):**
   mantenha a pasta em `.opencode/skills/derrubeitor/` na raiz do projeto.
@@ -94,6 +85,18 @@ manuais por design — a ferramenta imprime as instruções. E-mails seguem
 sempre manuais (Gmail pré-digitado). Para um provedor novo:
 `autoreport_forms.py map <url>` despeja o formulário e o próprio agente de
 IA escreve o adaptador seguindo os exemplos no script.
+
+## Preparação (5 minutos)
+
+1. Instale o Python 3.8 ou mais novo em https://www.python.org/downloads/ (no Windows, marque "Add Python to PATH" durante a instalação).
+2. Baixe ou clone esta pasta.
+3. Abra o terminal dentro da pasta e rode:
+
+   ```
+   python scripts/fraudtriage.py selftest
+   ```
+
+   Deve terminar com `selftest OK`. No Windows o comando pode ser `py` em vez de `python`.
 
 ## Caminho rápido: denunciar sem a ferramenta (10 minutos)
 
@@ -180,6 +183,7 @@ Denúncia falsa é crime. Só relate sites de golpe que você realmente recebeu 
 derrubeitor/
 ├── README.pt-BR.md          <- você está aqui
 ├── README.md                <- visão geral em inglês
+├── MANUAL.md                <- uso manual sem IA (inglês)
 ├── SKILL.md                 <- referência completa (inglês)
 ├── SKILL.pt-BR.md           <- referência completa (português)
 ├── scripts/
