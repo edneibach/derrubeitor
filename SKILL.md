@@ -193,7 +193,7 @@ gets police attention.
 8. **Meta/WhatsApp** (when the lure arrived on WhatsApp) — report the message
    and sender in-app.
 9. **Brazil officials** (same day, after the technical reports):
-   - Receita Federal impersonation → the official denúncia channel reached
+    - Receita Federal impersonation → the official complaint channel reached
      from https://www.gov.br/receitafederal (never via third-party links).
    - ANPD → https://www.gov.br/anpd when a live endpoint returns personal
      data (observed LGPD violation).
