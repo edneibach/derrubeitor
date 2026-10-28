@@ -38,9 +38,38 @@ mesmo documento falso exibindo dois CNPJs diferentes. Só a polícia
 
 ## 1. Fluxo de trabalho
 
-**Passo 0 — diretório do caso.** Crie `case-<dominio>-<aaaammdd>/`. Salve tudo
-com horário UTC (headers, corpos HTML, sha256 — a ferramenta imprime). A
-cadeia de custódia começa aqui.
+**Passo 0 — diretório do caso.** Crie `case-<dominio>-<aaaammdd>/` com este
+layout canônico (referência de trabalho: `case-limpar-divida.com-20261028/`):
+
+```
+case-<dominio>-<aaaammdd>/
+├── dossier.txt            # o ÚNICO arquivo de dossiê — fatos por camada, IOCs, hashes
+├── evidence/              # saída de recon/fetch/analyze/cnpj salva como .txt,
+│                          #   stage*.html brutos, *.json, iocs.csv, sha256-manifest.txt
+└── send/                  # uma pasta POR DESTINATÁRIO, numerada na ordem do §3
+    ├── 1-<hospedagem>/    # EMAIL.txt + gmail-link.txt + attachments/ (sem camada 3)
+    ├── 2-cloudflare/      # FORM.txt para canais de formulário web
+    ├── ...
+    └── 6-policia/         # ANEXO-POLICIAL.txt + attachments/ (caso completo, com camada 3)
+```
+
+Salve tudo com horário UTC (headers, corpos HTML, sha256 — a ferramenta
+imprime). A cadeia de custódia começa aqui.
+
+**Regras de arquivo do caso (DURAS, sem exceção):**
+- **NUNCA crie arquivos .md num caso — SOMENTE .txt.** Dossiê, denúncias,
+  anexos, leia-me, capturas de log de evidência: tudo `.txt`. Igualmente
+  proibido um único arquivo "bundle de relatórios" — as denúncias vivem
+  SOMENTE nas pastas por destinatário. Evidência bruta mantém a extensão
+  nativa (`.html`, `.json`, `.csv`) — a regra vale para todo documento que
+  o agente escreve.
+- **Uma pasta por provedor a contatar por e-mail**, dentro de `send/`,
+  numerada na ordem do §3 (`1-netlify/`, `2-cloudflare/`, `4-certbr/`,
+  `6-policia/`, …), cada uma com `EMAIL.txt` (+ `gmail-link.txt`) ou
+  `FORM.txt` para formulários web, e `attachments/` curado (sem camada 3
+  para todo destinatário que não seja a polícia).
+  O `makepackage.py case.json` monta essa árvore automaticamente; se for
+  escrever à mão, reproduza-a exatamente.
 
 **Passo 1 — reconhecimento.**
 ```
@@ -90,9 +119,11 @@ python scripts/fraudtriage.py cnpj 64.453.674/0001-24
 Marca automaticamente: SUSPENSA/BAIXADA + "inconsistência cadastral", truque
 de dígito-no-nome (`SERVIC0S`, `REGULARIZAND0`), abertura recente (<180 dias).
 
-**Passo 6 — monte o dossiê** (`dossier.txt`): fatos por camada, tabela de
-IOCs, linha do tempo, hashes das capturas/HTML, e o pacote de relatórios
-do §4. Depois gere os pacotes de envio sem scripts com
+**Passo 6 — monte o dossiê** (`dossier.txt` — NUNCA `.md`): fatos por camada,
+tabela de IOCs, linha do tempo, hashes das capturas/HTML. As denúncias do §4
+vão SOMENTE para as pastas por destinatário do Passo 0
+(`send/NN-<provedor>/EMAIL.txt` ou `FORM.txt`) — nunca um arquivo único
+combinado. Monte com
 `python scripts/makepackage.py case.json` (schema: `templates/case.example.json`).
 
 **Passo 7 — envie as denúncias no mesmo dia**, na ordem de prioridade do §3.

@@ -97,7 +97,7 @@ Mostra a situação cadastral (ativa, suspensa, baixada). É apenas uma pista: k
 
 ### 5) Montar o dossiê e o pacote de denúncias
 
-1. Reúna os fatos em um `dossier.txt`. A estrutura detalhada está em SKILL.md e SKILL.pt-BR.md.
+1. Reúna os fatos em um `dossier.txt` (**regra dura: nunca .md — só .txt**; as denúncias ficam exclusivamente nas pastas `send/NN-<destinatário>/`, uma por provedor — nunca num arquivo único combinado). A estrutura detalhada está em SKILL.md e SKILL.pt-BR.md.
 2. Preencha um `case.json` seguindo o modelo `templates/case.example.json`.
 3. Rode:
 
@@ -255,7 +255,7 @@ Shows the registry status (active, suspended, closed). It is only a lead: scam k
 
 ### 5) Build the dossier and the report package
 
-1. Gather the facts into a `dossier.txt`. The detailed structure is in SKILL.md and SKILL.pt-BR.md.
+1. Gather the facts into a `dossier.txt` (**hard rule: never .md — .txt only**; reports live exclusively in `send/NN-<recipient>/` folders, one per provider — never in one combined file). The detailed structure is in SKILL.md and SKILL.pt-BR.md.
 2. Fill a `case.json` following the model in `templates/case.example.json`.
 3. Run:
 

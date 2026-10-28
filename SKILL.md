@@ -49,9 +49,37 @@ BACENJUD) can connect a bank account to an actor.
 
 ## 1. Workflow
 
-**Step 0 — case directory.** Create `case-<domain>-<yyyymmdd>/`. Save
-everything with UTC timestamps (headers, HTML bodies, sha256 — the tool
+**Step 0 — case directory.** Create `case-<domain>-<yyyymmdd>/` with this
+canonical layout (working reference: `case-limpar-divida.com-20261028/`):
+
+```
+case-<domain>-<yyyymmdd>/
+├── dossier.txt            # the ONLY dossier file — tiered facts, IOCs, hashes
+├── evidence/              # recon/fetch/analyze/cnpj console output saved as .txt,
+│                          #   raw stage*.html, *.json, iocs.csv, sha256-manifest.txt
+└── send/                  # one folder PER RECIPIENT, numbered in §3 filing order
+    ├── 1-<origin-host>/   # EMAIL.txt + gmail-link.txt + attachments/ (no Tier 3)
+    ├── 2-cloudflare/      # FORM.txt for web-form channels
+    ├── ...
+    └── 6-policia/         # ANEXO-POLICIAL.txt + attachments/ (full case incl. Tier 3)
+```
+
+Save everything with UTC timestamps (headers, HTML bodies, sha256 — the tool
 prints them). Chain of custody starts here.
+
+**Case-file rules (HARD, no exceptions):**
+- **NEVER create .md files in a case — .txt ONLY.** Dossier, reports,
+  annexes, read-me files, evidence-log captures: all `.txt`. A single
+  monolithic "reports-bundle" file is equally forbidden — reports live ONLY
+  in their per-recipient folders. Raw evidence keeps its native extension
+  (`.html`, `.json`, `.csv`) — the rule targets every document the agent
+  writes.
+- **One folder per provider to email**, under `send/`, numbered in the §3
+  order (`1-netlify/`, `2-cloudflare/`, `4-certbr/`, `6-policia/`, …), each
+  holding `EMAIL.txt` (+ `gmail-link.txt`) or `FORM.txt` for web forms, plus
+  a curated `attachments/` (Tier-3-free for every non-police recipient).
+  `makepackage.py case.json` builds this tree automatically; when writing by
+  hand, reproduce it exactly.
 
 **Step 1 — recon.**
 ```
@@ -98,9 +126,10 @@ python scripts/fraudtriage.py cnpj 64.453.674/0001-24
 Auto-flags: SUSPENSA/BAIXADA + "inconsistência cadastral", digit-in-word
 name tricks (`SERVIC0S`, `REGULARIZAND0`), fresh registration (<180 days).
 
-**Step 6 — assemble the dossier** (`dossier.txt`): tiered facts, IOC table,
-timeline, screenshots/HTML hashes, and the report bundle from §4. Then
-generate the zero-script send/ packages with
+**Step 6 — assemble the dossier** (`dossier.txt` — NEVER `.md`): tiered facts,
+IOC table, timeline, screenshots/HTML hashes. The §4 reports go ONLY into the
+per-recipient folders of Step 0 (`send/NN-<provider>/EMAIL.txt` or `FORM.txt`)
+— never one combined reports file. Build them with
 `python scripts/makepackage.py case.json` (schema: `templates/case.example.json`).
 
 **Step 7 — file the reports same-day** in the priority order of §3.
