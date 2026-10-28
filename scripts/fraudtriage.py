@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-fraudtriage.py — stdlib-only OSINT triage for Brazilian fraud sites (phishing,
-fake gov.br / Receita Federal, PIX extortion kits).
+fraudtriage.py - stdlib-only OSINT triage for scam and phishing sites of
+any kind, with extra smarts for Brazilian fraud kits (fake gov.br / Receita
+Federal, PIX extortion).
 
 Model-agnostic: works anywhere Python 3.8+ runs. No third-party packages.
 No API keys (public keyless sources only: RDAP, crt.sh, urlscan.io public
