@@ -12,6 +12,28 @@ There is extra support for Brazilian scams: CNPJ lookup, CPF validation, CERT.br
 
 No sign-up, no API keys, no cost. The report package generated at the end is made of text files and links. Nothing runs on your machine when you send.
 
+## How it works
+
+The mechanism is the **abuse report** — a legitimate, lawful channel. Every provider that scams depend on (hosting, CDN, registrar) publishes an abuse contact and takes sites down when a report carries facts the provider can verify in its own systems. This project does the lawful part well: it gathers verifiable facts, packages them into the providers' own report formats, and puts them in front of the people who can act. Nothing here attacks, exploits or circumvents anyone — evidence is collected with plain GET requests, one per page, exactly like opening the page in a browser, and reports are only sent after you review them.
+
+Why that works: scams usually live on throwaway domains, but they are served by real providers: hosting, CDN, registrar. The `x-nf-request-id` header proves the site is on Netlify. The `cf-ray` header proves the response passed through Cloudflare. RDAP shows who registered the domain.
+
+With that in mind, the tool:
+
+1. Investigates the domain: registrar, hosting, CDN, age and history.
+2. Saves the scam pages as evidence, with UTC time and sha256 hash.
+3. Looks for markers of known scam kits.
+4. Builds the dossier and the report package: one folder per recipient, with the right attachments and a pre-typed Gmail link.
+5. You review and send. The tool never sends anything by itself.
+
+## What it does not do
+
+- It never asks for an account, password or API key.
+- It never sends anything by itself. Every send is manual, after your review.
+- It never interacts with the scam site beyond opening each page once. It never generates payments, never fills forms, never completes "verifications", never queries a real person's CPF.
+- Installing it is just downloading this folder.
+- The final report package contains only text files and links.
+
 ## Use it as an AI-agent skill (opencode, Claude Code, any agent)
 
 **This is the main way to use the project.** It is a slash skill: the instructions in `SKILL.md` teach any capable agent to run the entire workflow — recon, evidence collection, dossier, report package, and the optional assisted form submission — asking for your confirmation before anything is sent. It is model-agnostic: any agent that can read a file and run shell commands with Python 3.8+ can run it.
@@ -53,26 +75,6 @@ Everything the agent does can also be done by hand in a terminal — the scripts
    It must end with `selftest OK`. On Windows the command may be `py` instead of `python`.
 
 The complete manual walkthrough — investigating the domain, saving pages as evidence, building the dossier and the report package, sending the reports, and reporting with no tooling at all — lives in [MANUAL.md](MANUAL.md).
-
-## How it works
-
-Scams usually live on throwaway domains, but they are served by real providers: hosting, CDN, registrar. Those providers take the site down when the report carries facts they can check in their own systems. The `x-nf-request-id` header proves the site is on Netlify. The `cf-ray` header proves the response passed through Cloudflare. RDAP shows who registered the domain.
-
-With that in mind, the tool:
-
-1. Investigates the domain: registrar, hosting, CDN, age and history.
-2. Saves the scam pages as evidence, with UTC time and sha256 hash.
-3. Looks for markers of known scam kits.
-4. Builds the dossier and the report package: one folder per recipient, with the right attachments and a pre-typed Gmail link.
-5. You review and send. The tool never sends anything by itself.
-
-## What it does not do
-
-- It never asks for an account, password or API key.
-- It never sends anything by itself. Every send is manual, after your review.
-- It never interacts with the scam site beyond opening each page once. It never generates payments, never fills forms, never completes "verifications", never queries a real person's CPF.
-- Installing it is just downloading this folder.
-- The final report package contains only text files and links.
 
 ## Safety rules
 

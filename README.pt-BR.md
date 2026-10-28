@@ -11,16 +11,22 @@ Há suporte extra para golpes brasileiros: consulta de CNPJ, validação de CPF,
 
 Sem cadastro, sem chave de API, sem custo. O pacote de denúncias gerado no final é feito de arquivos de texto e links. Nada executa na sua máquina na hora de enviar.
 
-## Para quem é
-
-- **Uso principal: como skill no seu agente de IA** — opencode, Claude Code ou qualquer outro (veja a seção abaixo).
-- Você recebeu um golpe por WhatsApp, SMS ou e-mail e quer o site derrubado.
-- Sem conhecimento técnico: peça ao seu agente de IA, ou comece pela seção "Caminho rápido", que permite denunciar em dez minutos sem instalar nada.
-- Quem sabe usar um terminal pode ir até o final do caminho completo, que gera o dossiê de evidências e as denúncias com o Gmail já digitado.
-
 ## Como funciona
 
-Golpes costumam viver em domínios descartáveis, mas são servidos por provedores de verdade: hospedagem, CDN, registrador. Esses provedores derrubam o site quando a denúncia traz fatos que eles mesmos podem conferir em seus sistemas. O header `x-nf-request-id` prova que o site está na Netlify. O header `cf-ray` prova que a resposta passou pela Cloudflare. O RDAP mostra quem registrou o domínio.
+O mecanismo é a **denúncia de abuso** — um canal legítimo e lícito. Todo
+provedor de quem o golpe depende (hospedagem, CDN, registrador) publica um
+contato de abuso e derruba sites quando a denúncia traz fatos que ele
+mesmo consegue verificar nos próprios sistemas. Este projeto faz bem a
+parte lícita: reúne fatos verificáveis, embala-os nos formatos de denúncia
+dos próprios provedores e coloca-os na frente de quem pode agir. Nada aqui
+ataca, explora ou burla ninguém — a evidência é coletada com requisições
+GET comuns, uma por página, exatamente como abrir a página num navegador,
+e as denúncias só são enviadas depois da sua revisão.
+
+Por que funciona: golpes costumam viver em domínios descartáveis, mas são
+servidos por provedores de verdade. O header `x-nf-request-id` prova que o
+site está na Netlify. O header `cf-ray` prova que a resposta passou pela
+Cloudflare. O RDAP mostra quem registrou o domínio.
 
 Com isso em mente, a ferramenta:
 
@@ -37,6 +43,13 @@ Com isso em mente, a ferramenta:
 - Não interage com o site do golpe além de abrir as páginas, uma vez cada. Nunca gera PIX, nunca preenche formulário, nunca completa "verificação", nunca consulta CPF de pessoa real.
 - Não instala nada além de baixar esta pasta.
 - O pacote de denúncias final contém apenas arquivos de texto e links.
+
+## Para quem é
+
+- **Uso principal: como skill no seu agente de IA** — opencode, Claude Code ou qualquer outro (veja a seção abaixo).
+- Você recebeu um golpe por WhatsApp, SMS ou e-mail e quer o site derrubado.
+- Sem conhecimento técnico: peça ao seu agente de IA, ou comece pela seção "Caminho rápido", que permite denunciar em dez minutos sem instalar nada.
+- Quem sabe usar um terminal pode ir até o final do caminho completo, que gera o dossiê de evidências e as denúncias com o Gmail já digitado.
 
 ## Como usar como skill de agente de IA (opencode, Claude, outros)
 
