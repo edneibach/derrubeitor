@@ -132,7 +132,9 @@ per-recipient folders of Step 0 (`send/NN-<provider>/EMAIL.txt` or `FORM.txt`)
 — never one combined reports file. Build them with
 `python scripts/makepackage.py case.json` (schema: `templates/case.example.json`).
 
-**Step 7 — file the reports same-day** in the priority order of §3.
+**Step 7 — file the reports same-day** in the priority order of §3. ALWAYS
+ask the user before sending anything (consent-first — see §4 T-FORMS for the
+optional browser-assisted form submissions).
 
 **Step 8 — monitor daily** (rerun `recon`) until NXDOMAIN/404. Kits rotate
 domains; when a new domain appears, repeat and link the cases via kit
@@ -151,6 +153,7 @@ gets police attention.
 | `extractforms.py <saved.html>` | Form action/method + named fields of a saved page (recon of reporting forms) |
 | `gmaillink.py --to … --body-file …` | Pre-typed Gmail compose link (see §4 T-GMAIL) |
 | `makepackage.py case.json` | Generates the zero-script send/ package for a case (EMAIL.txt + gmail-link.txt + attachments per destination; schema: templates/case.example.json) |
+| `autoreport_forms.py <cmd>` | OPTIONAL browser-assisted web-form submission (camoufox; consent-first — see §4 T-FORMS before running) |
 | `selftest` | Offline sanity checks of validators + regexes |
 
 ## 3. Abuse-report matrix (hard targets + officials, in filing order)
@@ -294,7 +297,9 @@ evidence reproducible and the tool redistributable and trustworthy.
   `attachments/`. Fallback for truncated bodies: copy from EMAIL.txt.
 - **Web forms (Cloudflare, Safe Browsing, SmartScreen)**: manual paste —
   `FORM.txt` + `urls-kit.txt` are generated for it. Cloudflare's form is
-  bot-protected (403 to plain GET) — do not script it.
+  bot-protected (403 to plain GET) — do not script it with plain HTTP.
+  OPTIONAL automated/assisted path: §4 T-FORMS (`autoreport_forms.py`,
+  camoufox — only with explicit user consent, see protocol there).
 - **PhishTank**: requires a login — optional; the APWG email covers the same
   ground without credentials.
 - Deliberately OUT of the redistributable core, though they exist: the
@@ -302,6 +307,60 @@ evidence reproducible and the tool redistributable and trustworthy.
   channel requiring registration. Not needed for effective takedowns —
   email + forms do the job.
 - Human review before every send — automation prepares, the user sends.
+
+### T-FORMS — OPTIONAL browser-assisted form submission (autoreport_forms.py)
+
+Everything above stays manual-by-design (the user reviews, the user sends).
+This extra is COMPLETELY OPTIONAL, off by default, and **consent-first**:
+the agent asks BEFORE anything is sent, and asks for identity when a form
+needs it. Never silently submit.
+
+Protocol (non-negotiable, in this order):
+1. After the dossier + `send/` package are assembled, ASK:
+   "Evidence is compiled — may I file the reports now?" and list exactly
+   what would be sent where (provider, URLs, one submission each).
+2. If forms need reporter identity, ASK:
+   "Which name and email should the forms use? (Required by the provider;
+   never stored — used for this run only.)"
+3. Only after an explicit yes: run `scripts/autoreport_forms.py …`
+   (one submission per invocation; receipts land in `receipts/` with the
+   captured submit XHR as proof of what was sent).
+   Email reports are NEVER sent automatically — gmaillink/EMAIL.txt stay
+   human-sent by design.
+
+Capability matrix (tested 2026-10-28, camoufox v0.5.8, headless):
+- `cloudflare` AUTOMATABLE — no challenge even headless; reporter
+  name+email required; Turnstile renders at submit (auto or one click).
+- `gsb` AUTOMATABLE — reCAPTCHA-Enterprise is invisible/score-based (token
+  ready, no click); the app submits via XHR and silently resets the form,
+  so the receipt records the XHR as proof. One URL per hostname is enough.
+- `smartscreen` MANUAL — guest form has a character CAPTCHA (HIP);
+  signed-in needs a Microsoft account. The tool prints paste instructions.
+- `googleads` MANUAL — support harness requires a Google login. The tool
+  prints paste instructions (use the case's google-ads FORM.txt).
+
+Modes: `--dry-run` (prints the fill plan, types nothing) and `--assist`
+(opens a VISIBLE browser, everything pre-filled, the HUMAN clicks
+captcha/Submit — automation prepares, the human sends).
+
+Adding a NEW provider (this is an AI skill — extend it when a scam shows up
+on a provider not listed):
+```
+python scripts/autoreport_forms.py map <form-url>
+```
+The `map` command dumps the form structure (labels, inputs, buttons,
+selects+options, frames). Read the dump, copy the gsb adapter block in the
+script, adjust the selectors, register it in main(), and keep the
+consent-first rules. Verify with `--dry-run`, then `--assist`, before ever
+running headless.
+
+Install (OPTIONAL — the whole skill works without it):
+```
+pip install "camoufox[geoip]" && python -m camoufox fetch
+```
+(camoufox is free/open-source, no API keys; downloads a patched Firefox
+~2 GB. CloakBrowser also works for these forms but its current build needs
+a license key — out of the keyless design by choice.)
 
 ## 5. Known kit families (Brazil) — for case linkage
 

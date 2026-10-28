@@ -127,6 +127,9 @@ combinado. Monte com
 `python scripts/makepackage.py case.json` (schema: `templates/case.example.json`).
 
 **Passo 7 — envie as denúncias no mesmo dia**, na ordem de prioridade do §3.
+**Sempre pergunte ao usuário antes de enviar qualquer coisa** (consentimento
+primeiro — veja o T-FORMS do §4 para o envio opcional assistido por
+navegador).
 
 **Passo 8 — monitore diariamente** (rerode `recon`) até NXDOMAIN/404. Kits
 trocam de domínio; quando aparecer um domínio novo, repita e ligue os casos
@@ -145,6 +148,7 @@ pelos marcadores do kit (token de beacon, fonte HTTrack, roteiro de valores)
 | `extractforms.py <html-salvo>` | Action/método do form + campos nomeados de uma página salva (recon de formulários de denúncia) |
 | `gmaillink.py --to … --body-file …` | Link do Gmail pré-digitado (ver §4 T-GMAIL) |
 | `makepackage.py case.json` | Gera o pacote send/ sem scripts para o caso (EMAIL.txt + gmail-link.txt + attachments por destino; schema: templates/case.example.json) |
+| `autoreport_forms.py <cmd>` | Envio OPCIONAL assistido por navegador para formulários web (camoufox; consentimento primeiro — veja o T-FORMS do §4 antes de rodar) |
 | `selftest` | Checagem offline de validadores + regexes |
 
 ## 3. Matriz de denúncia (alvos duros + autoridades, na ordem de envio)
@@ -307,7 +311,10 @@ evidência reproduzível e a ferramenta redistribuível e confiável.
   `attachments/`. Fallback para corpo truncado: copiar do EMAIL.txt.
 - **Formulários web (Cloudflare, Safe Browsing, SmartScreen)**: colagem
   manual — `FORM.txt` + `urls-kit.txt` são gerados para isso. O formulário
-  da Cloudflare é protegido contra bots (403 ao GET simples) — não scripte.
+  da Cloudflare é protegido contra bots (403 ao GET simples) — não scripte
+  com HTTP puro. Caminho OPCIONAL automatizado/assistido: T-FORMS
+  (`autoreport_forms.py`, camoufox — só com consentimento explícito do
+  usuário; veja o protocolo lá).
 - **PhishTank**: exige login — opcional; o APWG por e-mail cobre o mesmo
   terreno sem credenciais.
 - Fora do núcleo redistribuível de propósito (existem, mas exigem conta):
@@ -315,6 +322,65 @@ evidência reproduzível e a ferramenta redistribuível e confiável.
   canal com cadastro. Não são necessários para derrubada eficaz — e-mail +
   formulários resolvem.
 - Revisão humana antes de cada envio — a automação prepara, o usuário envia.
+
+### T-FORMS — envio OPCIONAL assistido por navegador (autoreport_forms.py)
+
+Tudo acima continua manual por projeto (o usuário revisa, o usuário envia).
+Este extra é COMPLETAMENTE OPCIONAL, desligado por padrão, e com
+**consentimento primeiro**: o agente pergunta ANTES de enviar qualquer
+coisa, e pergunta a identidade quando o formulário exige. Nunca envie
+nada silenciosamente.
+
+Protocolo (inegociável, nesta ordem):
+1. Monte o dossiê + o pacote `send/`, depois PERGUNTE:
+   "A evidência está compilada — posso enviar as denúncias agora?" e liste
+   exatamente o que seria enviado para onde (provedor, URLs, uma submissão
+   de cada).
+2. Se o formulário exigir identidade do denunciante, PERGUNTE:
+   "Qual nome e e-mail os formulários devem usar? (Exigidos pelo provedor;
+   nunca ficam guardados — servem só para esta execução.)"
+3. Só depois de um sim explícito: rode `scripts/autoreport_forms.py …`
+   (uma submissão por invocação; os recibos vão para `receipts/` com o XHR
+   de submissão capturado como prova do que foi enviado).
+   Denúncias por e-mail NUNCA são enviadas automaticamente — gmaillink/
+   EMAIL.txt seguem manuais por projeto.
+
+Matriz de capacidade (testada 28/10/2026, camoufox v0.5.8, headless):
+- `cloudflare` AUTOMATIZÁVEL — sem desafio nem headless; exige nome+e-mail
+  do denunciante; Turnstile aparece no envio (auto ou um clique).
+- `gsb` AUTOMATIZÁVEL — reCAPTCHA-Enterprise invisível/baseado em score
+  (token pronto, sem clique); o app envia por XHR e reseta o formulário em
+  silêncio, então o recibo registra o XHR como prova. Uma URL por hostname
+  basta.
+- `smartscreen` MANUAL — formulário de convidado tem CAPTCHA de caracteres
+  (HIP); com login exige conta Microsoft. A ferramenta imprime as
+  instruções de colagem.
+- `googleads` MANUAL — o harness do suporte exige login Google. A ferramenta
+  imprime as instruções (use o FORM.txt do caso).
+
+Modos: `--dry-run` (imprime o plano de preenchimento, não digita nada) e
+`--assist` (abre um navegador VISÍVEL, tudo pré-preenchido, o HUMANO clica
+no captcha/Enviar — a automação prepara, o humano envia).
+
+Adicionando um NOVO provedor (isto é uma skill de IA — estenda quando um
+golpe aparecer num provedor não listado):
+```
+python scripts/autoreport_forms.py map <url-do-formulário>
+```
+O comando `map` despeja a estrutura do formulário (rótulos, inputs, botões,
+selects+opções, frames). Leia o despejo, copie o bloco do adaptador gsb no
+script, ajuste os seletores, registre no main() e mantenha as regras de
+consentimento. Verifique com `--dry-run`, depois `--assist`, antes de
+qualquer execução headless.
+
+Instalação (OPCIONAL — a skill inteira funciona sem isto):
+```
+pip install "camoufox[geoip]" && python -m camoufox fetch
+```
+(camoufox é gratuito/open-source, sem chaves de API; baixa um Firefox
+modificado de ~2 GB. O CloakBrowser também funciona para esses
+formulários, mas a build atual exige chave de licença — fora do desenho
+sem credenciais, por escolha.)
 
 ## 5. Famílias de kit conhecidas (Brasil) — para ligação de casos
 

@@ -47,6 +47,52 @@ Com isso em mente, a ferramenta:
 
    Deve terminar com `selftest OK`. No Windows o comando pode ser `py` em vez de `python`.
 
+## Como usar como skill de agente de IA (opencode, Claude, outros)
+
+O projeto é uma skill: as instruções (`SKILL.md`) ensinam o agente a conduzir
+o caso inteiro — recon, evidência, dossiê e denúncias — pedindo sua
+confirmação antes de qualquer envio.
+
+- **opencode (nível projeto — já fica automático neste repositório):**
+  mantenha a pasta em `.opencode/skills/derrubeitor/` na raiz do projeto.
+  O `SKILL.md` é carregado no início da sessão.
+- **opencode (global, todos os projetos):**
+  ```powershell
+  robocopy "<projeto>\.opencode\skills\derrubeitor" "$env:USERPROFILE\.config\opencode\skill\derrubeitor" /E
+  ```
+  e reinicie o opencode (skills são carregadas no início da sessão).
+- **Claude Code:** copie a pasta para `.claude/skills/derrubeitor/` no
+  projeto, ou para `~/.cla/skills/derrubeitor/` para todos os projetos.
+  A skill aparece como "derrubeitor".
+- **Outros agentes (Claude/GPT/Gemini via UI, scripts, CI):** anexe ou
+  aponte o `SKILL.md` como instrução e dê ao agente acesso a shell com
+  Python 3.8+. Todo o pipeline é stdlib, GET-only e sem chaves — qualquer
+  ambiente que rode `python scripts/fraudtriage.py selftest` consegue
+  executar o resto.
+
+### Envio assistido OPCIONAL dos formulários web (camoufox)
+
+Por padrão, formulários web (Cloudflare, Safe Browsing, SmartScreen,
+Google Ads) são colados manualmente — a ferramenta só prepara os textos.
+Há um caminho OPCIONAL, desligado por padrão, em que um navegador furtivo
+gratuito (camoufox) preenche o formulário por você; o agente de IA SEMPRE
+pergunta antes de usar ("posso enviar as denúncias agora?" e, se o
+formulário exigir, "qual nome e e-mail usar?"):
+
+```
+pip install "camoufox[geoip]" && python -m camoufox fetch   # ~2 GB, sem chaves
+python scripts/autoreport_forms.py status                    # o que é possível
+python scripts/autoreport_forms.py cf <urls> --dry-run      # plano, nada digitado
+python scripts/autoreport_forms.py cf <urls> --assist       # janela aberta: você clica em Enviar
+```
+
+Funciona headless para Cloudflare e Google Safe Browsing (reCAPTCHA
+invisível); SmartScreen (captcha de caracteres) e Google Ads (login) são
+manuais por design — a ferramenta imprime as instruções. E-mails seguem
+sempre manuais (Gmail pré-digitado). Para um provedor novo:
+`autoreport_forms.py map <url>` despeja o formulário e o próprio agente de
+IA escreve o adaptador seguindo os exemplos no script.
+
 ## Caminho rápido: denuncar sem a ferramenta (10 minutos)
 
 Se você só quer denunciar agora, sem instalar nada:
@@ -204,6 +250,50 @@ With that in mind, the tool:
    ```
 
    It must end with `selftest OK`. On Windows the command may be `py` instead of `python`.
+
+## Using it as an AI-agent skill (opencode, Claude, others)
+
+This project is a skill: the instructions (`SKILL.md`) teach the agent to
+run the whole case — recon, evidence, dossier, reports — asking for your
+confirmation before anything is sent.
+
+- **opencode (project level — automatic in this repo):** keep the folder at
+  `.opencode/skills/derrubeitor/` in the project root. `SKILL.md` is loaded
+  at session start.
+- **opencode (global, all projects):**
+  ```powershell
+  robocopy "<project>\.opencode\skills\derrubeitor" "$env:USERPROFILE\.config\opencode\skill\derrubeitor" /E
+  ```
+  then restart opencode (skills load at session start).
+- **Claude Code:** copy the folder to `.claude/skills/derrubeitor/` in the
+  project, or `~/.cla/skills/derrubeitor/` for all projects.
+- **Any other agent (Claude/GPT/Gemini via UI, scripts, CI):** attach or
+  point the agent at `SKILL.md` and give it a shell with Python 3.8+. The
+  pipeline is stdlib-only, GET-only, keyless — anything that can run
+  `python scripts/fraudtriage.py selftest` can run the rest.
+
+### OPTIONAL assisted submission of web forms (camoufox)
+
+By default, web forms (Cloudflare, Safe Browsing, SmartScreen, Google Ads)
+are pasted manually — the tool only prepares the texts. There is an
+OPTIONAL path, off by default, where a free stealth browser (camoufox)
+fills the form for you; the AI agent ALWAYS asks first ("may I file the
+reports now?" and, when the form requires it, "which name and email should
+the forms use?"):
+
+```
+pip install "camoufox[geoip]" && python -m camoufox fetch   # ~2 GB, no keys
+python scripts/autoreport_forms.py status                    # capability matrix
+python scripts/autoreport_forms.py cf <urls> --dry-run      # plan, nothing typed
+python scripts/autoreport_forms.py cf <urls> --assist       # open window: you click Submit
+```
+
+Works headless for Cloudflare and Google Safe Browsing (invisible
+reCAPTCHA); SmartScreen (character CAPTCHA) and Google Ads (login) stay
+manual by design — the tool prints the instructions. Email reports always
+stay manual (pre-typed Gmail). For a NEW provider:
+`autoreport_forms.py map <url>` dumps the form, and the AI agent writes the
+adapter itself following the examples in the script.
 
 ## Quick path: report without the tool (10 minutes)
 
