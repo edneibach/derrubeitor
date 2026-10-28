@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+
+# Case outputs — they contain evidence and sometimes VICTIM DATA.
+# NEVER push these to a public repo.
+case-*/
+evidence/
+send/
+test-send/
+test-case.json
+dossier.txt
+mensagem-isca.txt
+iocs*.csv
+sha256-manifest.txt
+stage*.html
+fetch-*.txt
+recon-*.txt
+analyze-*.txt
+cnpj-*.txt

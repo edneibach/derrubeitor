@@ -1,0 +1,55 @@
+{
+  "case_name": "case-example.com-20260101",
+  "_schema": "makepackage.py input. All paths are relative to this file. 'body_file'/'text_file' hold the pure body text (no headers). 'attachments' supports globs; keep provider folders Tier-3-free (no victim PII, no CNPJ/CPF leads) — full evidence goes only in 'police'.",
+
+  "emails": [
+    {
+      "order": 1,
+      "name": "1-netlify",
+      "to": "support@netlify.com",
+      "subject": "Phishing impersonating <TARGET> — example.com — x-nf-request-id <ID>",
+      "body_file": "reports/netlify-body.txt",
+      "attachments": ["evidence/fetch-*.txt", "evidence/stage*.html", "evidence/sha256-manifest.txt"]
+    },
+    {
+      "order": 3,
+      "name": "3-registrante",
+      "to": "abuse@example-registrar.com",
+      "subject": "Phishing domain — example.com (registered <DATE>) — <TARGET> impersonation",
+      "body_file": "reports/registrante-body.txt",
+      "attachments": ["evidence/recon-*.txt", "evidence/fetch-*.txt", "evidence/stage*.html"]
+    },
+    {
+      "order": 4,
+      "name": "4-certbr",
+      "to": "cert@cert.br",
+      "subject": "Phishing ativo — <TARGET> — example.com (<ORIGEM>/<CDN>/<REGISTRADOR>)",
+      "body_file": "reports/certbr-body.txt",
+      "attachments": ["evidence/iocs-tecnicos.csv", "evidence/recon-*.txt", "evidence/sha256-manifest.txt"]
+    }
+  ],
+
+  "forms": [
+    {
+      "order": 2,
+      "name": "2-cloudflare",
+      "form_url": "https://abuse.cloudflare.com/phishing",
+      "text_file": "reports/cloudflare-form.txt"
+    }
+  ],
+
+  "blocklist_urls": [
+    "https://example.com/gvg",
+    "https://example.com/gvgconsulta",
+    "https://example.com/gvgchat",
+    "https://example.com/gvgpix"
+  ],
+
+  "police": {
+    "name": "6-policia",
+    "annex_file": "reports/anexo-policia.txt",
+    "attachments": ["evidence/*", "dossier.txt"]
+  },
+
+  "instructions_file": "reports/instrucoes-blocklists.txt"
+}

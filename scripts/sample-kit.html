@@ -1,0 +1,30 @@
+<!-- TEST FIXTURE — synthetic gvg-family kit page for fraudtriage.py analyze.
+     Real IOC values from case 2026-10-28 (processo.limpar-divida.com) are reused
+     here as documentation-by-example. Run:
+     python fraudtriage.py analyze sample-kit.html --csv iocs.csv -->
+<!-- Mirrored from regularizadebitos.click/gov/ by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 07 Jun 2026 01:21:40 GMT -->
+<html lang="pt-BR"><head><title>Receita Federal</title>
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+<script src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"3b7e4700fd74406bbfabeeaa99024733"}'></script>
+<script src="https://cdn.tailwindcss.com"></script></head>
+<body>
+<nav>gov.br — Ministério da Fazenda — INTIMAÇÃO FISCAL — e-CAC — VLibras</nav>
+<form action="/gvgconsulta"><input name="cpf" placeholder="000.000.000-00">
+<button class="captcha-box">Não sou um robô</button></form>
+<div>Beneficiário PRIME_SOLUCOES_CORPORATIV<br>CNPJ 64.453.674/0001-24 — CNPJ: 64631157000106</div>
+<div>Portador do CPF 052.182.791-45 — Desenrola Brasil — DARF</div>
+<div>Valor original R$ 419,55 — com desconto R$ 138,45 — multa R$1.985,00</div>
+<script>
+const res = await fetch('/cpf?cpf=' + encodeURIComponent(cpf));
+fetch('api/gerar_pix.php', {method:'POST'});
+fetch("api/buscar_telefone.php?cpf=" + cpf);
+localStorage.setItem("customerData", JSON.stringify(customerData));
+localStorage.setItem("CPF", cpfDigitado);
+localStorage.setItem("telefone", "");
+window.location.replace("about:blank");
+</script>
+<a href="processando-pagamento.html">processando</a> /gvgpix /gvgchat NOME_MAE showMaeVerification Cliente Com Restrição
+<div>00020126580014BR.GOV.BCB.PIX0136123e4567e89b12d3a4567e89b12d3a4567e89b12d3a4567e89b12d3a4567</div>
+<a href="https://chat.whatsapp.com/AbCdEfGhIjK12345">grupo</a>
+<img data-sitekey="6LdGeRQUAAAAANAalsdkFdm3lDdlaBOGhxh9Nmk">
+</body></html>
